@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Heart, Plus, Check, Edit2, Coffee } from 'lucide-react';
+import { Users, Heart, Plus, Check, Edit2, Trash2 } from 'lucide-react';
 import { FamilyMember } from '../types';
 
 interface FamilyBannerProps {
@@ -18,18 +18,22 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
   // Helper getters
   const anneMember = familyMembers.find((m) => m.role === 'anne');
   const babaMember = familyMembers.find((m) => m.role === 'baba');
-  const cocuklar = familyMembers.filter((m) => m.role.includes('cocuk'));
+  const existingChildren = familyMembers.filter((m) => m.role.includes('cocuk'));
 
   const [anneName, setAnneName] = useState(anneMember?.name || '');
   const [babaName, setBabaName] = useState(babaMember?.name || '');
-  const [cocukNames, setCocukNames] = useState<string[]>(
-    cocuklar.length > 0 ? cocuklar.map((c) => c.name) : ['']
-  );
+
+  // Up to 4 children names on the first page
+  const [child1, setChild1] = useState(existingChildren[0]?.name || '');
+  const [child2, setChild2] = useState(existingChildren[1]?.name || '');
+  const [child3, setChild3] = useState(existingChildren[2]?.name || '');
+  const [child4, setChild4] = useState(existingChildren[3]?.name || '');
 
   const handleQuickSave = (e: React.FormEvent) => {
     e.preventDefault();
     const newMembers: FamilyMember[] = [];
 
+    // Anne
     if (anneName.trim()) {
       newMembers.push({
         id: anneMember?.id || 'anne-' + Date.now(),
@@ -41,6 +45,7 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
       });
     }
 
+    // Baba
     if (babaName.trim()) {
       newMembers.push({
         id: babaMember?.id || 'baba-' + Date.now(),
@@ -52,15 +57,30 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
       });
     }
 
-    cocukNames.forEach((cName, idx) => {
-      if (cName.trim()) {
+    // Up to 4 Children
+    const childrenInput = [
+      { name: child1, label: '1. Çocuk' },
+      { name: child2, label: '2. Çocuk' },
+      { name: child3, label: '3. Çocuk' },
+      { name: child4, label: '4. Çocuk' }
+    ];
+
+    const childColors = [
+      'from-amber-500 to-orange-600',
+      'from-teal-500 to-emerald-600',
+      'from-purple-500 to-indigo-600',
+      'from-pink-500 to-rose-600'
+    ];
+
+    childrenInput.forEach((ch, idx) => {
+      if (ch.name.trim()) {
         newMembers.push({
-          id: cocuklar[idx]?.id || 'cocuk-' + idx + '-' + Date.now(),
-          name: cName.trim(),
+          id: existingChildren[idx]?.id || `cocuk-${idx + 1}-${Date.now()}`,
+          name: ch.name.trim(),
           role: idx === 0 ? 'buyuk_cocuk' : idx === 1 ? 'ortanca_cocuk' : 'kucuk_cocuk',
-          roleLabel: idx === 0 ? 'Çocuk' : `Çocuk ${idx + 1}`,
-          avatarColor: idx % 2 === 0 ? 'from-amber-500 to-orange-600' : 'from-teal-500 to-emerald-600',
-          favoriteDrink: cocuklar[idx]?.favoriteDrink || 'Sıcak Ihlamur & Kurabiye'
+          roleLabel: ch.label,
+          avatarColor: childColors[idx],
+          favoriteDrink: existingChildren[idx]?.favoriteDrink || 'Sıcak Ihlamur & Kurabiye'
         });
       }
     });
@@ -71,23 +91,10 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
     }
   };
 
-  const addCocukInput = () => {
-    setCocukNames([...cocukNames, '']);
-  };
-
-  const updateCocukName = (idx: number, val: string) => {
-    const updated = [...cocukNames];
-    updated[idx] = val;
-    setCocukNames(updated);
-  };
-
-  const removeCocukInput = (idx: number) => {
-    const updated = cocukNames.filter((_, i) => i !== idx);
-    setCocukNames(updated.length > 0 ? updated : ['']);
-  };
+  const childrenCount = familyMembers.filter((m) => m.role.includes('cocuk')).length;
 
   return (
-    <div className="mb-8 bg-gradient-to-r from-amber-100 via-orange-100 to-amber-100 p-5 rounded-3xl border-2 border-orange-300 shadow-md">
+    <div className="mb-6 bg-gradient-to-r from-amber-100 via-orange-100 to-amber-100 p-5 rounded-3xl border-2 border-orange-300 shadow-md">
       {!isEditingInline ? (
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3 text-center sm:text-left">
@@ -107,6 +114,9 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
               <div className="text-sm sm:text-base font-serif font-black text-amber-950 flex items-center justify-center sm:justify-start gap-1.5">
                 <Heart className="w-4 h-4 text-rose-600 fill-rose-600" />
                 <span>Hoş Geldiniz, Canım Ailemiz!</span>
+                <span className="text-xs bg-orange-200 text-orange-900 px-2 py-0.5 rounded-full font-sans font-bold">
+                  {childrenCount} Çocuk Kayıtlı
+                </span>
               </div>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-1">
                 {familyMembers.map((m) => (
@@ -128,7 +138,7 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
               className="py-2 px-4 bg-white hover:bg-orange-50 text-orange-950 border border-orange-300 rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 cursor-pointer transition"
             >
               <Edit2 className="w-3.5 h-3.5 text-orange-600" />
-              İsimleri Değiştir
+              İsimleri Düzenle (4 Çocuğa Kadar)
             </button>
             <button
               onClick={onOpenModal}
@@ -140,19 +150,19 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
           </div>
         </div>
       ) : (
-        /* Direct Inline Naming Form */
+        /* Direct Inline Naming Form: Anne, Baba, 4 Çocuğa Kadar */
         <form onSubmit={handleQuickSave} className="space-y-4 animate-fadeIn">
-          <div className="flex items-center justify-between border-b border-orange-300 pb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-orange-300 pb-2 gap-1">
             <div className="text-sm font-serif font-black text-amber-950 flex items-center gap-2">
               <Users className="w-4 h-4 text-orange-600" />
-              <span>Aile Üyelerimizin İsimlerini Yazalım</span>
+              <span>Aile Üyelerimizin İsimlerini Yazalım (Anne, Baba ve 4 Çocuğa Kadar)</span>
             </div>
-            <span className="text-xs text-stone-600">
-              Anne, Baba ve Çocuklarınızın adlarını yazarak kaydedin
+            <span className="text-xs text-stone-600 font-medium">
+              Çocuklarınızın isimlerini ilgili kutucuklara yazınız
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
             {/* Anne */}
             <div>
               <label className="block text-xs font-bold text-stone-800 mb-1">
@@ -160,7 +170,7 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
               </label>
               <input
                 type="text"
-                placeholder="Annenin adı..."
+                placeholder="Anne adı..."
                 value={anneName}
                 onChange={(e) => setAnneName(e.target.value)}
                 className="w-full text-xs font-medium rounded-xl border border-orange-300 p-2.5 bg-white text-stone-900 focus:ring-2 focus:ring-orange-500 shadow-inner"
@@ -174,50 +184,74 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
               </label>
               <input
                 type="text"
-                placeholder="Babanın adı..."
+                placeholder="Baba adı..."
                 value={babaName}
                 onChange={(e) => setBabaName(e.target.value)}
                 className="w-full text-xs font-medium rounded-xl border border-orange-300 p-2.5 bg-white text-stone-900 focus:ring-2 focus:ring-orange-500 shadow-inner"
               />
             </div>
 
-            {/* Çocuklar */}
-            {cocukNames.map((cName, idx) => (
-              <div key={idx} className="relative">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-stone-800">
-                    👧👦 {idx === 0 ? 'Çocuk' : `${idx + 1}. Çocuk`}
-                  </label>
-                  {cocukNames.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeCocukInput(idx)}
-                      className="text-[10px] text-rose-600 hover:underline font-bold"
-                    >
-                      Kaldır
-                    </button>
-                  )}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Çocuğun adı..."
-                  value={cName}
-                  onChange={(e) => updateCocukName(idx, e.target.value)}
-                  className="w-full text-xs font-medium rounded-xl border border-orange-300 p-2.5 bg-white text-stone-900 focus:ring-2 focus:ring-orange-500 shadow-inner"
-                />
-              </div>
-            ))}
+            {/* 1. Çocuk */}
+            <div>
+              <label className="block text-xs font-bold text-stone-800 mb-1">
+                👧👦 1. Çocuk
+              </label>
+              <input
+                type="text"
+                placeholder="1. Çocuk adı..."
+                value={child1}
+                onChange={(e) => setChild1(e.target.value)}
+                className="w-full text-xs font-medium rounded-xl border border-orange-300 p-2.5 bg-white text-stone-900 focus:ring-2 focus:ring-orange-500 shadow-inner"
+              />
+            </div>
+
+            {/* 2. Çocuk */}
+            <div>
+              <label className="block text-xs font-bold text-stone-800 mb-1">
+                👧👦 2. Çocuk
+              </label>
+              <input
+                type="text"
+                placeholder="2. Çocuk adı..."
+                value={child2}
+                onChange={(e) => setChild2(e.target.value)}
+                className="w-full text-xs font-medium rounded-xl border border-orange-300 p-2.5 bg-white text-stone-900 focus:ring-2 focus:ring-orange-500 shadow-inner"
+              />
+            </div>
+
+            {/* 3. Çocuk */}
+            <div>
+              <label className="block text-xs font-bold text-stone-800 mb-1">
+                👧👦 3. Çocuk
+              </label>
+              <input
+                type="text"
+                placeholder="3. Çocuk adı..."
+                value={child3}
+                onChange={(e) => setChild3(e.target.value)}
+                className="w-full text-xs font-medium rounded-xl border border-orange-300 p-2.5 bg-white text-stone-900 focus:ring-2 focus:ring-orange-500 shadow-inner"
+              />
+            </div>
+
+            {/* 4. Çocuk */}
+            <div>
+              <label className="block text-xs font-bold text-stone-800 mb-1">
+                👧👦 4. Çocuk
+              </label>
+              <input
+                type="text"
+                placeholder="4. Çocuk adı..."
+                value={child4}
+                onChange={(e) => setChild4(e.target.value)}
+                className="w-full text-xs font-medium rounded-xl border border-orange-300 p-2.5 bg-white text-stone-900 focus:ring-2 focus:ring-orange-500 shadow-inner"
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-between pt-2">
-            <button
-              type="button"
-              onClick={addCocukInput}
-              className="py-1.5 px-3 bg-amber-200 hover:bg-amber-300 text-orange-950 text-xs font-bold rounded-xl border border-orange-300 flex items-center gap-1 cursor-pointer transition"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              + Bir Çocuk Daha Ekle
-            </button>
+            <span className="text-xs text-stone-600 italic">
+              * Ailenizde kaç çocuk varsa o kadar kutuyu doldurmanız yeterlidir.
+            </span>
 
             <div className="flex items-center gap-2">
               <button
@@ -229,7 +263,7 @@ export const FamilyBanner: React.FC<FamilyBannerProps> = ({
               </button>
               <button
                 type="submit"
-                className="py-2 px-5 bg-orange-700 hover:bg-orange-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer transition"
+                className="py-2 px-6 bg-orange-700 hover:bg-orange-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer transition"
               >
                 <Check className="w-4 h-4" />
                 İsimleri Kaydet

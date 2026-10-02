@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { FamilyBanner } from './components/FamilyBanner';
+import { MeetingReminderBanner } from './components/MeetingReminderBanner';
 import { BookReader } from './components/BookReader';
 import { BookDiscussion } from './components/BookDiscussion';
+import { MoodCalendar } from './components/MoodCalendar';
 import { WeeklySchedule } from './components/WeeklySchedule';
 import { DailyGameCard } from './components/DailyGameCard';
 import { FamilyMeeting } from './components/FamilyMeeting';
@@ -73,12 +75,15 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Family Member Names Banner (Direct write/edit area) */}
+        {/* Family Member Names Banner (Direct write/edit area - Up to 4 children) */}
         <FamilyBanner
           familyMembers={familyMembers}
           onSaveFamily={handleSaveFamily}
           onOpenModal={() => setIsFamilyModalOpen(true)}
         />
+
+        {/* Meeting Countdown & Browser Notification Reminder Banner */}
+        <MeetingReminderBanner onGoToMeeting={() => setActiveTab('meeting')} />
 
         {/* Tab Views */}
         {activeTab === 'stories' && (
@@ -92,6 +97,32 @@ export default function App() {
           <BookDiscussion
             familyMembers={familyMembers}
             onGoToStories={() => setActiveTab('stories')}
+          />
+        )}
+
+        {activeTab === 'mood' && (
+          <MoodCalendar
+            familyMembers={familyMembers}
+            onSendLoveNote={(toName, message) => {
+              try {
+                const existing = JSON.parse(localStorage.getItem('aile_messages') || '[]');
+                const newNote = {
+                  id: 'msg-' + Date.now(),
+                  fromName: 'Tüm Aile',
+                  fromRole: 'Aile',
+                  toName,
+                  messageText: message,
+                  category: 'sevgi',
+                  color: 'rose',
+                  createdAt: 'Az önce',
+                  likes: 1
+                };
+                localStorage.setItem('aile_messages', JSON.stringify([newNote, ...existing]));
+                setActiveTab('messages');
+              } catch (e) {
+                console.error(e);
+              }
+            }}
           />
         )}
 

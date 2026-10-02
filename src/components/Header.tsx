@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Calendar, Heart, BookOpen, Users, Sparkles, MessageSquareHeart, CheckSquare, Coffee, MessageSquare } from 'lucide-react';
+import { Clock, Calendar, Heart, BookOpen, Users, Sparkles, MessageSquareHeart, CheckSquare, Coffee, MessageSquare, Smile } from 'lucide-react';
 import { FamilyMember } from '../types';
 import { BOOK_METADATA } from '../data/bookData';
 
@@ -49,6 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
   const navItems = [
     { id: 'stories', label: 'Kitap & Öyküler', icon: BookOpen },
     { id: 'discussion', label: 'Kitap Hakkında Sohbet', icon: MessageSquare },
+    { id: 'mood', label: 'Duygu Takvimi', icon: Smile },
     { id: 'weekly', label: '7 Günlük Etkinlik', icon: Calendar },
     { id: 'games', label: 'Her Güne Oyun', icon: Sparkles },
     { id: 'meeting', label: 'Aile Toplantısı & Word', icon: Coffee },
