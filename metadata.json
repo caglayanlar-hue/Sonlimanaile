@@ -1,0 +1,6 @@
+{
+  "name": "Aile Dediğin - Aile İçi İletişim ve Etkinlik Portalı",
+  "description": "Aile Dediğin kitabı hikayeleri, haftalık aile toplantısı, Word kararlar çıktısı, 7 günlük etkinlikler, oyunlar, görev paylaşımı ve sevgi mesaj panosu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
