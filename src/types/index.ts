@@ -111,23 +111,3 @@ export interface FamilyTask {
   category: 'mutfak' | 'salon' | 'toplanti' | 'sevgi';
 }
 
-export type MoodType =
-  | 'cok_mutlu'
-  | 'neseli'
-  | 'sakin'
-  | 'yorgun'
-  | 'uzgun'
-  | 'stresli';
-
-export interface MoodEntry {
-  id: string;
-  date: string; // YYYY-MM-DD
-  memberId: string;
-  memberName: string;
-  memberRole: string;
-  mood: MoodType;
-  emoji: string;
-  moodLabel: string;
-  note?: string;
-  score: number; // 20 to 100 for happiness meter
-}

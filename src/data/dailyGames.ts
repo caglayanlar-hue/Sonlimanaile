@@ -63,7 +63,7 @@ export const DAILY_GAMES: DailyGame[] = [
   },
   {
     id: 'game-5',
-    title: 'Hikâye Tamamlamace (Duvardaki Saat Maceraları)',
+    title: 'Hikâye Tamamlamaca (Duvardaki Saat Maceraları)',
     subtitle: 'Hayal Gücü ve Ortak Masal Kurma',
     durationMinutes: 20,
     materialsNeeded: 'Sıcak bir demlik çay veya ıhlamur',

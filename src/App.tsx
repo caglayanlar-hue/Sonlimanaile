@@ -4,7 +4,6 @@ import { FamilyBanner } from './components/FamilyBanner';
 import { MeetingReminderBanner } from './components/MeetingReminderBanner';
 import { BookReader } from './components/BookReader';
 import { BookDiscussion } from './components/BookDiscussion';
-import { MoodCalendar } from './components/MoodCalendar';
 import { WeeklySchedule } from './components/WeeklySchedule';
 import { DailyGameCard } from './components/DailyGameCard';
 import { FamilyMeeting } from './components/FamilyMeeting';
@@ -12,35 +11,20 @@ import { MessageBoard } from './components/MessageBoard';
 import { ResponsibilitiesBoard } from './components/ResponsibilitiesBoard';
 import { FamilySetupModal } from './components/FamilySetupModal';
 import { FamilyMember } from './types';
-import { Heart, Sparkles, BookOpen } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
-// Clean initial family members (no pre-filled old names, users enter their real names!)
-const INITIAL_FAMILY: FamilyMember[] = [
-  {
-    id: 'f1',
-    name: 'Anne',
-    role: 'anne',
-    roleLabel: 'Anne',
-    avatarColor: 'from-rose-500 to-pink-600',
-    favoriteDrink: 'Tavşan Kanı Demli Çay'
-  },
-  {
-    id: 'f2',
-    name: 'Baba',
-    role: 'baba',
-    roleLabel: 'Baba',
-    avatarColor: 'from-blue-600 to-indigo-700',
-    favoriteDrink: 'Karanfilli Sıcak Çay'
-  },
-  {
-    id: 'f3',
-    name: '1. Çocuk',
-    role: 'buyuk_cocuk',
-    roleLabel: 'Çocuk',
-    avatarColor: 'from-amber-500 to-orange-600',
-    favoriteDrink: 'Sıcak Ihlamur & Kurabiye'
-  }
-];
+// Sanitize members so generic role words (Anne, Baba, Çocuk) never appear as people's names
+const sanitizeMembers = (members: FamilyMember[]): FamilyMember[] => {
+  return members.filter((m) => {
+    const lower = m.name?.trim().toLowerCase() || '';
+    return (
+      lower &&
+      !['anne', 'baba', 'çocuk', 'cocuk', '1. çocuk', '2. çocuk', '3. çocuk', '4. çocuk'].includes(
+        lower
+      )
+    );
+  });
+};
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('stories');
@@ -48,16 +32,21 @@ export default function App() {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(() => {
     try {
       const saved = localStorage.getItem('aile_members_data_v2');
-      return saved ? JSON.parse(saved) : INITIAL_FAMILY;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return sanitizeMembers(parsed);
+      }
+      return [];
     } catch {
-      return INITIAL_FAMILY;
+      return [];
     }
   });
 
   const handleSaveFamily = (members: FamilyMember[]) => {
-    setFamilyMembers(members);
+    const cleaned = sanitizeMembers(members);
+    setFamilyMembers(cleaned);
     try {
-      localStorage.setItem('aile_members_data_v2', JSON.stringify(members));
+      localStorage.setItem('aile_members_data_v2', JSON.stringify(cleaned));
     } catch (e) {
       console.error(e);
     }
@@ -65,7 +54,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-amber-50/70 text-stone-900 selection:bg-orange-200">
-      {/* Top Header with live clock, quote & navigation */}
+      {/* Top Header with live clock, quote & UPPERCASE navigation */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -75,7 +64,7 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Family Member Names Banner (Direct write/edit area - Up to 4 children) */}
+        {/* Family Member Names Banner - Only actual names displayed */}
         <FamilyBanner
           familyMembers={familyMembers}
           onSaveFamily={handleSaveFamily}
@@ -100,32 +89,6 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'mood' && (
-          <MoodCalendar
-            familyMembers={familyMembers}
-            onSendLoveNote={(toName, message) => {
-              try {
-                const existing = JSON.parse(localStorage.getItem('aile_messages') || '[]');
-                const newNote = {
-                  id: 'msg-' + Date.now(),
-                  fromName: 'Tüm Aile',
-                  fromRole: 'Aile',
-                  toName,
-                  messageText: message,
-                  category: 'sevgi',
-                  color: 'rose',
-                  createdAt: 'Az önce',
-                  likes: 1
-                };
-                localStorage.setItem('aile_messages', JSON.stringify([newNote, ...existing]));
-                setActiveTab('messages');
-              } catch (e) {
-                console.error(e);
-              }
-            }}
-          />
-        )}
-
         {activeTab === 'weekly' && <WeeklySchedule />}
 
         {activeTab === 'games' && <DailyGameCard />}
@@ -146,21 +109,20 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer - Celebrating BİLSEM Student Writers (No teacher/director names) */}
+      {/* Footer - Sadece Aile Dediğin */}
       <footer className="bg-stone-950 text-stone-300 border-t-2 border-orange-600 mt-16 py-10 px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-4">
           <div className="flex items-center justify-center gap-2 text-amber-400 font-serif font-black text-xl">
             <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-            <span>Bilsem Öğrencilerinin Kaleminden Aile Dediğin</span>
+            <span>AİLE DEDİĞİN</span>
           </div>
 
           <p className="text-xs text-stone-400 leading-relaxed font-serif max-w-2xl mx-auto italic">
-            "Aile, insanın ruhunu ısıtan en eski ocaktır. Bir çocuğun masumiyeti ve bir gencin heyecanıyla harmanlanan bu öyküler, dijital dünyanın soğukluğuna karşı verilmiş en samimi cevaptır."
+            &ldquo;Aile, insanın ruhunu ısıtan en eski ve en samimi yuvadır. Birbirimize vakit ayırmak, dinlemek ve sevmek yuvamızı güzelleştirir.&rdquo;
           </p>
 
           <div className="border-t border-stone-800 pt-4 text-xs text-amber-200/90 font-medium">
-            <strong className="text-amber-400">BİLSEM Öğrenci Yazarlarımız:</strong><br />
-            Ertuğrul ERDEM • Sahra KARAKAYA • Eslim Deniz UŞAR • Fatih Mehmet DEMİRTAŞ • Eslem Beyza EKMEN • Zehra AY • Büşra ERYİĞİT • Cihangir Kenan YILDIRIM • Yusuf ÜNAL • Zeynep Nevra AY
+            <strong className="text-amber-400">Aile Rehberi:</strong> Birlikte okunan öyküler, yapılan sohbetler ve paylaşılan çaylar aile bağlarımızı güçlendirir.
           </div>
         </div>
       </footer>

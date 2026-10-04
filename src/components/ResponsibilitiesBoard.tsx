@@ -192,8 +192,8 @@ export const ResponsibilitiesBoard: React.FC<ResponsibilitiesBoardProps> = ({ fa
                       {task.title}
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-stone-600 mt-0.5">
-                      <span className="font-bold text-orange-900 bg-orange-100 px-2 py-0.5 rounded">
-                        {task.assignedRole}: {task.assignedTo}
+                      <span className="font-bold text-orange-950 bg-orange-100 px-2 py-0.5 rounded">
+                        {task.assignedTo}
                       </span>
                       <span>•</span>
                       <span>{task.frequency}</span>
@@ -239,7 +239,7 @@ export const ResponsibilitiesBoard: React.FC<ResponsibilitiesBoardProps> = ({ fa
                   <option value="Tüm Aile">Tüm Aile Birlikte</option>
                   {familyMembers.map((m) => (
                     <option key={m.id} value={m.name}>
-                      {m.name} ({m.roleLabel})
+                      {m.name}
                     </option>
                   ))}
                 </select>

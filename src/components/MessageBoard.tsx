@@ -153,7 +153,7 @@ export const MessageBoard: React.FC<MessageBoardProps> = ({ familyMembers }) => 
               >
                 {familyMembers.map((m) => (
                   <option key={m.id} value={m.name}>
-                    {m.name} ({m.roleLabel})
+                    {m.name}
                   </option>
                 ))}
               </select>
@@ -294,7 +294,7 @@ export const MessageBoard: React.FC<MessageBoardProps> = ({ familyMembers }) => 
                     {/* Header info */}
                     <div className="flex items-center justify-between text-xs mb-2 pt-1">
                       <div className="font-bold text-stone-800">
-                        {msg.fromName} ({msg.fromRole}) ➔{' '}
+                        {msg.fromName} ➔{' '}
                         <span className="text-amber-900 font-bold">{msg.toName}</span>
                       </div>
                       <span className="text-[10px] text-stone-500">{msg.createdAt}</span>

@@ -222,7 +222,7 @@ export const FamilyMeeting: React.FC<FamilyMeetingProps> = ({
               >
                 {familyMembers.map((m) => (
                   <option key={m.id} value={m.name}>
-                    {m.name} ({m.roleLabel})
+                    {m.name}
                   </option>
                 ))}
               </select>
@@ -238,7 +238,7 @@ export const FamilyMeeting: React.FC<FamilyMeetingProps> = ({
               >
                 {familyMembers.map((m) => (
                   <option key={m.id} value={m.name}>
-                    {m.name} ({m.roleLabel})
+                    {m.name}
                   </option>
                 ))}
               </select>
@@ -272,8 +272,7 @@ export const FamilyMeeting: React.FC<FamilyMeetingProps> = ({
                         : 'bg-stone-100 text-stone-600 border-stone-300 hover:bg-stone-200'
                     }`}
                   >
-                    <span>{m.roleLabel}:</span>
-                    <strong>{m.name}</strong>
+                    <span>{m.name}</span>
                     {isSelected && <span className="text-amber-300">✓</span>}
                   </button>
                 );
